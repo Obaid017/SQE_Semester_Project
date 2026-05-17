@@ -1,0 +1,8 @@
+# Database Connector for SQL Server
+pyodbc==4.0.32
+
+# Production Cryptography Library (Needed to fix plaintext password flaws)
+bcrypt==3.2.0
+
+# WSGI Web Server for application portals
+gunicorn==20.1.0
