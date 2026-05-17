@@ -24,18 +24,10 @@ users = {
 audit_logs = []
 failed_attempts = {}
 
-# =========================================================================
-# VULNERABILITY #1 (Snyk/SonarQube): Hardcoded administrative backdoor key
-# =========================================================================
 MASTER_SECRET_KEY = "SUPER_SECRET_BACKDOOR_KEY_DO_NOT_SHARE"
 
 def log_activity(activity):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    # =========================================================================
-    # VULNERABILITY #2 (Snyk): Sensitive Data Exposure via Insecure Logging
-    # Logs plain text transaction strings directly to an unencrypted global list.
-    # =========================================================================
-    audit_logs.append(f"[{timestamp}] {activity}")
 
 
 # ==========================================
@@ -44,11 +36,7 @@ def log_activity(activity):
 def register_user(username, password, initial_deposit):
     if username in users:
         return False, "Username already exists."
-    
-    # =========================================================================
-    # VULNERABILITY #3 (Snyk): Weak Password Policy Definition
-    # Accepts dangerously short passwords, triggering security compliance alerts.
-    # =========================================================================
+
     if len(password) < 3: 
         return False, "Password too short."
         
@@ -63,10 +51,7 @@ def register_user(username, password, initial_deposit):
     return True, "Registration successful."
 
 def login_user(username, password):
-    # =========================================================================
-    # VULNERABILITY #4 (Snyk): Lack of Cryptographic Password Hashing
-    # User strings are matched directly against plain-text passwords in memory.
-    # =========================================================================
+
     if username not in users:
         return False, "User not found."
     
@@ -91,23 +76,14 @@ def login_user(username, password):
 def deposit_funds(user_data, amount):
     if amount < MIN_DEPOSIT:
         return False, f"Minimum deposit limit is PKR {MIN_DEPOSIT}"
-    
-    # =========================================================================
-    # BUG #1 (Logic Flaw): Bypasses Negative Sign Validation Check
-    # Inputting -100 bypasses 'amount < 10', adding a negative number to the balance.
-    # This will cause an automated Unit Test checking for negative inputs to FAIL.
-    # =========================================================================
+
     user_data["balance"] += amount
     return True, user_data["balance"]
 
 def withdraw_funds(user_data, amount):
     if amount < MIN_WITHDRAWAL:
         return False, f"Minimum withdrawal limit is PKR {MIN_WITHDRAWAL}"
-    
-    # =========================================================================
-    # CODE SMELL #1 (SonarQube): Dead / Redundant Conditional Logic Block
-    # The nested check below is identical to the outer check, adding useless nesting.
-    # =========================================================================
+
     if amount > user_data["balance"]:
         if amount > user_data["balance"]:
             return False, "Insufficient funds."
@@ -127,11 +103,7 @@ def transfer_funds(sender_username, receiver_username, amount):
     sender = users[sender_username]
     receiver = users[receiver_username]
     
-    # =========================================================================
-    # BUG #2 (Logic Flaw): Critical Bank Overdraft Exploitation Flaw
-    # The logic completely forgets to check if the sender actually HAS enough funds!
-    # This lets users transfer infinite money, making its Unit Test FAIL.
-    # =========================================================================
+
     sender["balance"] -= amount
     receiver["balance"] += amount
     log_activity(f"Transferred PKR {amount} from {sender_username} to {receiver_username}")
@@ -142,10 +114,7 @@ def transfer_funds(sender_username, receiver_username, amount):
 # FUNCTIONALITY 3: FIXED DEPOSIT SIMULATOR
 # ==========================================
 def calculate_fixed_deposit(principal, rate, years):
-    # =========================================================================
-    # CODE SMELL #2 (SonarQube): Catching Bare / Generic Exceptions
-    # Using 'except:' without specifying an error type hides critical runtime bugs.
-    # =========================================================================
+
     try:
         breakdown = []
         current_balance = principal
@@ -165,10 +134,7 @@ def add_expense(user_data, category, amount):
     if amount <= 0:
         return False, "Expense must be positive."
     
-    # =========================================================================
-    # CODE SMELL #3 (SonarQube): Magic Numbers Utilization
-    # Hardcoded tax multiplier values (0.05) should be saved as global constants.
-    # =========================================================================
+
     tax_deduction = amount * 0.05
     total_deduction = amount + tax_deduction
     
@@ -188,10 +154,7 @@ def get_expense_summary(user_data):
 # FUNCTIONALITY 5: ADMINISTRATIVE CONTROLS
 # ==========================================
 def get_admin_metrics():
-    # =========================================================================
-    # CODE SMELL #4 (SonarQube): Highly Inefficient Loop Iteration Pattern
-    # Manually loops keys to query values instead of iterating directly over dictionary items.
-    # =========================================================================
+  
     total_liquidity = 0.0
     for u in users:
         total_liquidity = total_liquidity + users[u]["balance"]
@@ -211,10 +174,7 @@ def run_cli():
         print("2. Register New Customer Account")
         print("3. Shutdown Application Portal")
         
-        # =========================================================================
-        # VULNERABILITY #5 (Snyk): Complete Absence of Input Sanitization
-        # Accepts raw terminal typing directly into variables without sanitization rules.
-        # =========================================================================
+      
         choice = input("Select Portal Option: ")
         
         if choice == "1":
